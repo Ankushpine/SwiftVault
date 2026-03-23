@@ -31,7 +31,7 @@ const Login = () => {
 
       // Login successful
       setMasterPassword(formData.password)
-      navigate('/home')
+      navigate('/')
     } catch (err: any) {
       setError(err.message || 'Failed to sign in')
     } finally {

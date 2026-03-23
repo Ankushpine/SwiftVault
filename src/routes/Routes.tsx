@@ -30,15 +30,14 @@ const Routes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route
-        path="/home"
+        path="/"
         element={
           <ProtectedRoute>
             <Home />
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="*" element={<Navigate to="/home" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </RouterRoutes>
   )
 }

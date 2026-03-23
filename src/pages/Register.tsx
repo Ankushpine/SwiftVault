@@ -82,7 +82,7 @@ const Register = () => {
         // 3. Success Feedback and Navigation
         if (data.session) {
            // Immediate login
-           navigate('/home')
+           navigate('/')
         } else {
            // Email confirmation required
            toast('Please check your email to confirm your account.', {
