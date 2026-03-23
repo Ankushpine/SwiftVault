@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* Global responsive base styles */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+/* Safe area support for iPhone notch / home indicator */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Smooth scrolling for modal internals */
+.modal-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent layout shift when modals are open */
+body.modal-open {
+  overflow: hidden;
+}

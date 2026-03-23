@@ -48,7 +48,7 @@ const Login = () => {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${isDark ? 'bg-[#0a0e14]' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
+    <div className={`min-h-screen overflow-y-auto flex items-center justify-center p-4 py-8 transition-colors duration-300 ${isDark ? 'bg-[#0a0e14]' : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
       }`}>
       {/* Theme Toggle */}
       <button

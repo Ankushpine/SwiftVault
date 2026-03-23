@@ -33,7 +33,7 @@ const AddGroupModal = ({ isDark, isOpen, initialName = '', onClose, onSave }: Ad
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
@@ -41,8 +41,7 @@ const AddGroupModal = ({ isDark, isOpen, initialName = '', onClose, onSave }: Ad
             ></div>
 
             {/* Modal */}
-            <div className={`relative w-full max-w-md rounded-2xl shadow-xl transform transition-all scale-100 ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'
-                }`}>
+            <div className={`relative w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl transform transition-all scale-100 max-h-[90vh] overflow-y-auto ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'}`}>
                 <div className={`p-6 border-b ${isDark ? 'border-gray-800' : 'border-gray-100'}`}>
                     <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         {initialName ? 'Edit Group' : 'Create New Group'}

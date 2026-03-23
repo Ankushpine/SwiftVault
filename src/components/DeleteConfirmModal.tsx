@@ -11,7 +11,7 @@ const DeleteConfirmModal = ({ isDark, isOpen, title = 'Delete Account?', account
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
@@ -19,8 +19,7 @@ const DeleteConfirmModal = ({ isDark, isOpen, title = 'Delete Account?', account
             />
 
             {/* Modal */}
-            <div className={`relative w-full max-w-md mx-4 rounded-2xl shadow-2xl ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'
-                }`}>
+            <div className={`relative w-full sm:max-w-md sm:mx-4 rounded-t-2xl sm:rounded-2xl shadow-2xl ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'}`}>
                 <div className="p-6">
                     {/* Warning Icon */}
                     <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/20">

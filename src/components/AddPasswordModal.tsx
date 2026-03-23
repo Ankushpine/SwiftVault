@@ -171,7 +171,7 @@ const AddPasswordModal = ({ isDark, isOpen, editMode = false, initialData = null
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
@@ -179,28 +179,21 @@ const AddPasswordModal = ({ isDark, isOpen, editMode = false, initialData = null
             />
 
             {/* Modal */}
-            <div className={`relative w-full max-w-2xl mx-4 rounded-2xl shadow-2xl ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'
-                }`}>
+            <div className={`relative w-full sm:max-w-2xl sm:mx-4 rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] ${isDark ? 'bg-[#1a1f2e]' : 'bg-white'}`}>
                 {/* Header */}
-                <div className={`px-6 py-4 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'
-                    }`}>
+                <div className={`px-4 sm:px-6 py-4 border-b flex-shrink-0 ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'
-                                }`}>
+                            <h2 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                                 {editMode ? 'Edit Account' : 'Add New Account'}
                             </h2>
-                            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'
-                                }`}>
+                            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                 Securely store your credentials in the encrypted vault.
                             </p>
                         </div>
                         <button
                             onClick={handleClose}
-                            className={`p-2 rounded-lg transition-colors ${isDark
-                                ? 'hover:bg-gray-800 text-gray-400'
-                                : 'hover:bg-gray-100 text-gray-600'
-                                }`}
+                            className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-600'}`}
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -209,9 +202,9 @@ const AddPasswordModal = ({ isDark, isOpen, editMode = false, initialData = null
                     </div>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="px-6 py-6" autoComplete="off">
-                    <div className="grid grid-cols-2 gap-4">
+                {/* Form — scrollable on small screens */}
+                <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto flex-1" autoComplete="off">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Account Name */}
                         <div>
                             <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
@@ -510,3 +503,4 @@ const AddPasswordModal = ({ isDark, isOpen, editMode = false, initialData = null
 }
 
 export default AddPasswordModal
+

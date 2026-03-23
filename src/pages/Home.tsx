@@ -17,17 +17,18 @@ import { fetchGroups, addGroup, updateGroup, deleteGroup } from '../lib/groupMan
 const Home = () => {
     const { masterPassword } = useAuth()
     const [isDark, setIsDark] = useState(false)
-    const [activeGroup, setActiveGroup] = useState('all') 
+    const [activeGroup, setActiveGroup] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isGroupModalOpen, setIsGroupModalOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false) // mobile sidebar drawer
 
     // Groups State
     const [groups, setGroups] = useState<any[]>([])
     const [loadingGroups, setLoadingGroups] = useState(true)
 
     // passwords state will now hold our Vault Items
-    const [passwords, setPasswords] = useState<any[]>([]) 
+    const [passwords, setPasswords] = useState<any[]>([])
     const [editingPassword, setEditingPassword] = useState<any | null>(null)
     const [deletingPassword, setDeletingPassword] = useState<any | null>(null)
     const [viewingPassword, setViewingPassword] = useState<Password | null>(null)
@@ -39,16 +40,12 @@ const Home = () => {
         try {
             setLoadingGroups(true)
             const data = await fetchGroups()
-             // Map Supabase data to UI (assuming fields: id, name, icon, user_id)
             const mapped = data.map((g: any) => ({
                 id: g.id,
                 label: g.name,
                 icon: g.icon_type || '📁',
                 color: 'gray'
             }))
-            // Add 'All', 'Favorites', 'Recent' are handled by Sidebar statically or logic?
-            // Sidebar handles 'all', 'favorites', 'recent' separately in `menuItems`. 
-            // `groups` prop is only for user defined groups.
             setGroups(mapped)
         } catch (error) {
             console.error('Error loading groups:', error)
@@ -62,18 +59,15 @@ const Home = () => {
         loadGroups()
     }, [])
 
-    // Helper to map Supabase Vault Item to UI Password object
     const mapVaultItemToPassword = (item: any, groups: any[]) => {
-        // Find group by ID or Label (handles legacy/demo data where name might be stored)
         const groupObj = groups.find(g => g.id === item.group_name || g.label === item.group_name);
-        
         return {
             id: item.id,
             account: item.account_name,
             username: item.username || '',
             email: item.email || '',
             password: item.password,
-            group: groupObj ? groupObj.id : item.group_name, // Prefer UUID for Modal selection
+            group: groupObj ? groupObj.id : item.group_name,
             groupLabel: groupObj ? groupObj.label : item.group_name,
             phoneNumber: item.phone_no || '',
             isFavorite: item.is_favorite,
@@ -85,13 +79,11 @@ const Home = () => {
         };
     };
 
-    // Load Vault Data
     const [loadingPasswords, setLoadingPasswords] = useState(true)
 
     useEffect(() => {
       const loadDashboard = async () => {
-        if (!masterPassword) return; 
-        
+        if (!masterPassword) return;
         try {
           setLoadingPasswords(true)
           const items = await fetchVaultEntries(masterPassword, activeGroup);
@@ -99,40 +91,32 @@ const Home = () => {
           setPasswords(mappedItems);
         } catch (error) {
             console.error("Error loading vault entries:", error);
-            // toast.error("Failed to load passwords"); // Optional: depends on UX preference
         } finally {
             setLoadingPasswords(false)
         }
       };
-      
       loadDashboard();
-    }, [masterPassword, activeGroup, groups]); 
+    }, [masterPassword, activeGroup, groups]);
 
-
-    // Filter passwords based on active group and search query
     const filteredPasswords = useMemo(() => {
         let filtered = passwords
-        
         if (activeGroup === 'favorites') {
             filtered = filtered.filter(p => p.isFavorite)
         } else if (activeGroup === 'recent') {
             const sevenDaysAgo = new Date()
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
             filtered = passwords.filter(p => p.createdAt >= sevenDaysAgo)
-        } 
-        
+        }
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase().trim()
             filtered = filtered.filter(p => p.account.toLowerCase().includes(query))
         }
-
         return filtered
     }, [activeGroup, passwords, searchQuery])
 
-    // Get group display name and description
     const getGroupInfo = () => {
         switch (activeGroup) {
-            case 'all': 
+            case 'all':
                 return { name: 'All Passwords', description: 'Manage all your saved credentials.' }
             case 'favorites':
                 return { name: 'Favorites', description: 'Your most frequently accessed passwords.' }
@@ -169,9 +153,7 @@ const Home = () => {
                  toast.error('Session invalid. Please login again.');
                  return;
             }
-
             if (editingPassword) {
-                // Update logic
                 await updateVaultEntry(editingPassword.id, {
                     accountName: data.account,
                     group: data.group,
@@ -182,10 +164,8 @@ const Home = () => {
                     securityQuestion: data.securityQuestion,
                     securityAnswer: data.securityAnswer
                 }, masterPassword);
-                
                 toast.success('Password updated successfully!');
             } else {
-                // Add new entry
                 await addVaultEntry({
                     accountName: data.account,
                     group: data.group,
@@ -196,11 +176,8 @@ const Home = () => {
                     securityQuestion: data.securityQuestion,
                     securityAnswer: data.securityAnswer
                 }, masterPassword);
-                
                 toast.success('Password saved successfully!');
             }
-
-            // Refresh list
             const items = await fetchVaultEntries(masterPassword, activeGroup);
             const mappedItems = items.map((item: any) => mapVaultItemToPassword(item, groups));
             setPasswords(mappedItems);
@@ -215,23 +192,14 @@ const Home = () => {
     const handleToggleFavorite = async (password: Password) => {
         try {
             const newFavoriteStatus = !password.isFavorite;
-            
-            // Optimistic update
-            setPasswords(currentPasswords => {
-                return currentPasswords.map(p => {
-                    if (p.id === password.id) {
-                        return { ...p, isFavorite: newFavoriteStatus }
-                    }
-                    return p
-                })
-            })
-
+            setPasswords(currentPasswords => currentPasswords.map(p =>
+                p.id === password.id ? { ...p, isFavorite: newFavoriteStatus } : p
+            ))
             await toggleFavorite(password.id, newFavoriteStatus);
             toast.success(newFavoriteStatus ? 'Added to favorites' : 'Removed from favorites');
         } catch (error) {
             console.error('Error toggling favorite:', error);
             toast.error('Failed to update favorite status');
-            // Revert optimistic update if needed (omitted for simplicity, but could be added)
         }
     }
 
@@ -299,23 +267,22 @@ const Home = () => {
         }
     }
 
-
-
     return (
-        <div className={`flex h-screen transition-colors ${isDark ? 'bg-[#0a0e14]' : 'bg-gray-50'
-            }`}>
+        <div className={`flex h-screen overflow-hidden transition-colors ${isDark ? 'bg-[#0a0e14]' : 'bg-gray-50'}`}>
             <Sidebar
                 isDark={isDark}
                 activeGroup={activeGroup}
                 groups={groups}
                 isLoading={loadingGroups}
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
                 onGroupChange={setActiveGroup}
                 onEditGroup={handleEditGroup}
                 onDeleteGroup={handleDeleteGroup}
             />
 
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="p-8 pb-4 flex-shrink-0">
+            <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+                <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-2 sm:pb-4 flex-shrink-0">
                     <Header
                         isDark={isDark}
                         groupName={groupInfo.name}
@@ -328,10 +295,11 @@ const Home = () => {
                             setIsGroupModalOpen(true)
                         }}
                         onThemeToggle={() => setIsDark(!isDark)}
+                        onMenuOpen={() => setIsSidebarOpen(true)}
                     />
                 </div>
 
-                <div className="flex-1 px-8 pb-8 min-h-0">
+                <div className="flex-1 px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6 lg:pb-8 min-h-0">
                     <PasswordTable
                         isDark={isDark}
                         passwords={filteredPasswords}
@@ -391,7 +359,6 @@ const Home = () => {
                 onSave={handleSaveGroup}
             />
 
-
             <PasswordDetailsModal
                 isDark={isDark}
                 isOpen={!!viewingPassword}
@@ -400,9 +367,9 @@ const Home = () => {
                 onEdit={handleEditFromDetails}
             />
 
-            <UnlockVaultModal 
-                isOpen={!masterPassword} 
-                isDark={isDark} 
+            <UnlockVaultModal
+                isOpen={!masterPassword}
+                isDark={isDark}
             />
         </div>
     )
